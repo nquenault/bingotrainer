@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Twitch 2025 - Mode Sombre</title>
+    <title>dracos_gaming_tv - Twitch</title>
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/nquenault/bingotrainer/refs/heads/main/favicon.png" crossorigin="anonymous">
     <style>
         * {
             font-family: Inter, Roobert, "Helvetica Neue", Helvetica, Arial;
@@ -35,21 +36,20 @@
             /*gap: 10px;*/
             background-color: #0e0e10;
         }
-        .message {
-
-        }
         .message-content {
             padding: 5px;
             border-radius: 12px;
-            max-width: 75%;
         }
         .icons {
             display: inline;
             vertical-align: middle;
         }
+        .icons img {
+            margin-right: 5px;
+        }
         .username {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 2px;
         }
         .input-container {
@@ -75,7 +75,7 @@
             color: white;
             cursor: pointer;
             margin-left: 10px;
-            padding: 10px 8px;
+            padding: 8px;
             font-weight: 600;
             border-radius: 5px;
         }
@@ -98,71 +98,107 @@
     </script>
     <script>
         $(() => {
+            var getUrlParam = (p, d) => {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(p) ? urlParams.get(p) : 'random_no_luck_user';
+            };
+
+            var username = getUrlParam('u');
+
             var bingo = {
+                botname: 'WizeBot',
+                chaticons: 'mod',
+                color: '#6189ff',
                 active: false,
                 result: null,
                 range: { min: 1, max: 25 },
-                update: () => {
-
+                giveSomeLuckToRiv: true,
+                reset: () => {
+                    bingo.active = false;
+                    bingo.result = null;
                 },
                 start: () => {
                     bingo.result = Math.floor(Math.random() * bingo.range.max) + bingo.range.min;
+                    bingo.active = true;
                 },
                 sendMessage: (m) => {
-                    addLine('WizeBot', m, '#6189ff');
+                    addLine(bingo.botname, m, bingo.color, bingo.chaticons);
                 }
             };
 
             var evalLine = (u, m) => {
                 if(m == '!bingo')
                 {
-                    bingo.active = true;
-                    bingo.sendMessage('Trouve un nombre entre '+bingo.range.min+' et '+bingo.range.max);
-                    bingo.start();
+                    if(bingo.active)
+                    {
+                        bingo.sendMessage('Bingo en cours, tentez de gagner le jeu en trouvant le bon chiffre entre '+bingo.range.min+' et '+bingo.range.max);
+                    }
+                    else
+                    {
+                        bingo.sendMessage('Tapez un nombre de '+bingo.range.min+' à '+bingo.range.max+' pour tenter de gagner!');
+                        bingo.start();
+                    }
                 }
 
                 if(bingo.active && /^[0-9]+$/.test(m))
                 {
-                    bingo.sendMessage('Gagné !');
-                    bingo.active = false;
-                    bingo.result = null;
+                    if(m == bingo.result || bingo.giveSomeLuckToRiv)
+                    {
+                        let m = '████████████████████████████████<br />'+u+' GAGNE le bingo avec le nombre 1.<br />████████████████████████████████  Tentatives: 1 - Proches: 1 - Durée: 1s';
+
+                        bingo.sendMessage(m);
+                        bingo.reset();
+                    }
                 }
             };
 
-            var addLine = (u, m, c, i) => {
+            var addLine = (u, m, c = 'grey', i = '') => {
+                if(!u || !m)
+                return;
+
                 let line = '<div class="message-content"><div class="icons">';
-                if(i)
-                line += '<img src="https://raw.githubusercontent.com/nquenault/bingotrainer/refs/heads/main/'+i+'.jpg" />';
-                line += '</div> <span class="username" style="color: '+c+';">'+u+'</span>: '+m+'</div>';
+
+                if(typeof i == 'string')
+                i = [i];
+
+                m = m.replace('@'+username, '<b>@'+username+'</b>');
+                
+                i.forEach(item => { if(item) line += '<img src="https://raw.githubusercontent.com/nquenault/bingotrainer/refs/heads/main/'+item+'.jpg" />' });
+                line += '</div><span class="username" style="color: '+c+';">'+u+'</span>: '+m+'</div>';
 
                 $('.chat-messages').append(line);
+                $('.chat-messages').scrollTop($('.chat-messages')[0].scrollHeight - $('.chat-messages').height());
+
                 evalLine(u, m);
             };
 
             var sendUserMessage = () => {
-                addLine('xx_riviera_horsing_xx', $('#cinput').val(), 'rgb(255, 105, 180)', 'sub');
+                if(!$('#cinput').val())
+                return;
+
+                addLine(username, $('#cinput').val(), 'rgb(255, 105, 180)', 'sub');
                 $('#cinput').val('');
             };
 
             $('#cinput').keypress((e) => {
                 if(e.which == 13)
                 sendUserMessage();
-            });            
+            });
 
             $('.input-container button').click(sendUserMessage);
+
+            addLine('NkGaming', 'Tu peux lancer un !bingo @'+username+' plizzzz ??', 'rgb(11, 149, 11)');
         });
     </script>
 </head>
 <body>
     <div class="chat-container">
-        <div id="topbar">
-            CHAT DU STREAM
-        </div>
+        <div id="topbar">CHAT DU STREAM</div>
         <div class="chat-messages">
             <div style="color: grey; margin-bottom: 5px;">Bienvenue sur le chat !</div>
         </div>
         <div class="input-container">
-            <input type="text" id="cinput" placeholder="Envoyer un message...">
+            <input type="text" id="cinput" placeholder="Envoyer un message">
             <button>Chat</button>
         </div>
     </div>
