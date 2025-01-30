@@ -1,1 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Twitch 2025 - Mode Sombre</title>
+    <style>
+        * {
+            font-family: Inter, Roobert, "Helvetica Neue", Helvetica, Arial;
+            font-size: 13px;
+        }
+        body {
+            background-color: #18181b;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 10px 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            /*gap: 10px;*/
+            background-color: #0e0e10;
+        }
+        .message {
 
+        }
+        .message-content {
+            padding: 5px;
+            border-radius: 12px;
+            max-width: 75%;
+        }
+        .icons {
+            display: inline;
+            vertical-align: middle;
+        }
+        .username {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        .input-container {
+            display: flex;
+            border-top: 1px solid #323232;
+            padding: 12px 16px;
+            background-color: #1e1e24;
+            align-items: center;
+        }
+        .input-container input {
+            flex: 1;
+            background: #26262c;
+            border: none;
+            padding: 10px;
+            color: white;
+            font-size: 13px;
+            border-radius: 8px;
+            outline: none;
+        }
+        .input-container button {
+            background-color: rgb(147, 76, 255);
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+            padding: 10px 8px;
+            font-weight: 600;
+            border-radius: 5px;
+        }
+        .input-container button:hover {
+            background-color: rgb(129, 45, 255);
+        }
+        #topbar {
+            padding: 15px;
+            text-align: center;
+            font-family: Inter, Roobert, "Helvetica Neue", Helvetica, Arial;
+            font-weight: 600;
+            font-size: 13px;
+            border-bottom: 1px solid gray;
+        }
+    </style>
+     <script
+        src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous">
+    </script>
+    <script>
+        $(() => {
+            var bingo = {
+                active: false,
+                result: null,
+                range: { min: 1, max: 25 },
+                update: () => {
+
+                },
+                start: () => {
+                    bingo.result = Math.floor(Math.random() * bingo.range.max) + bingo.range.min;
+                },
+                sendMessage: (m) => {
+                    addLine('WizeBot', m, '#6189ff');
+                }
+            };
+
+            var evalLine = (u, m) => {
+                if(m == '!bingo')
+                {
+                    bingo.active = true;
+                    bingo.sendMessage('Trouve un nombre entre '+bingo.range.min+' et '+bingo.range.max);
+                    bingo.start();
+                }
+
+                if(bingo.active && /^[0-9]+$/.test(m))
+                {
+                    bingo.sendMessage('Gagné !');
+                    bingo.active = false;
+                    bingo.result = null;
+                }
+            };
+
+            var addLine = (u, m, c, i) => {
+                let line = '<div class="message-content"><div class="icons">';
+                if(i)
+                line += '<img src="https://raw.githubusercontent.com/nquenault/bingotrainer/refs/heads/main/'+i+'.jpg" />';
+                line += '</div> <span class="username" style="color: '+c+';">'+u+'</span>: '+m+'</div>';
+
+                $('.chat-messages').append(line);
+                evalLine(u, m);
+            };
+
+            var sendUserMessage = () => {
+                addLine('xx_riviera_horsing_xx', $('#cinput').val(), 'rgb(255, 105, 180)', 'sub');
+                $('#cinput').val('');
+            };
+
+            $('#cinput').keypress((e) => {
+                if(e.which == 13)
+                sendUserMessage();
+            });            
+
+            $('.input-container button').click(sendUserMessage);
+        });
+    </script>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="topbar">
+            CHAT DU STREAM
+        </div>
+        <div class="chat-messages">
+            <div style="color: grey; margin-bottom: 5px;">Bienvenue sur le chat !</div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="cinput" placeholder="Envoyer un message...">
+            <button>Chat</button>
+        </div>
+    </div>
+</body>
+</html>
